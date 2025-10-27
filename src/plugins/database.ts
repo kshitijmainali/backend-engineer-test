@@ -1,7 +1,9 @@
 import type { FastifyInstance } from "fastify";
-import { Pool } from "pg";
+import pg from "pg";
 
-async function dbPlugin(fastify: FastifyInstance, options: any) {
+const { Pool } = pg;
+
+async function dbPlugin(fastify: FastifyInstance) {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL
   });
