@@ -1,8 +1,8 @@
-import { type FastifyInstance } from "fastify";
+import { type FastifyInstance } from 'fastify';
 
 const defaultRoutes = async (fastify: FastifyInstance) => {
-  fastify.get("/", async () => {
-    return { hello: "world" };
+  fastify.get('/', async () => {
+    return { hello: 'world' };
   });
 };
 

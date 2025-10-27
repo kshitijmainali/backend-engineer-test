@@ -1,7 +1,7 @@
-import fastify from "fastify";
-import dbPlugin from "./plugins/database";
-import globalErrorHandler from "./plugins/errorHandler";
-import defaultRoutes from "./routes";
+import fastify from 'fastify';
+import dbPlugin from './plugins/database';
+import globalErrorHandler from './plugins/errorHandler';
+import defaultRoutes from './routes';
 
 const buildApp = () => {
   const app = fastify({ logger: false });

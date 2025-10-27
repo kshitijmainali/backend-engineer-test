@@ -28,9 +28,7 @@
         "blocks_height_unique": {
           "name": "blocks_height_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "height"
-          ]
+          "columns": ["height"]
         }
       },
       "policies": {},
