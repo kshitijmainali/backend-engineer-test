@@ -1,3 +1,4 @@
+import "dotenv/config";
 import type { FastifyInstance } from "fastify";
 import buildApp from "./app";
 
