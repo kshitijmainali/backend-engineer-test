@@ -1,27 +1,22 @@
-import type { FastifyInstance } from "fastify";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { type FastifyInstance } from "fastify";
+import fp from "fastify-plugin";
 import pg from "pg";
-
+import * as schema from "../db/schema";
 const { Pool } = pg;
 
 async function dbPlugin(fastify: FastifyInstance) {
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+  const db = drizzle<typeof schema>(pool);
+
+  fastify.decorate("db", db);
+
+  fastify.addHook("onClose", async () => {
+    await pool.end();
   });
 
-  try {
-    await pool.connect();
-    fastify.log.info("🟢 PostgreSQL connected successfully");
-
-    fastify.addHook("onClose", async (fastifyInstance) => {
-      await pool.end();
-      fastifyInstance.log.info("🔴 PostgreSQL connection closed");
-    });
-
-    fastify.decorate("db", pool);
-  } catch (err) {
-    fastify.log.error("❌ PostgreSQL connection error:", err);
-    throw err;
-  }
+  fastify.log.info("✅ PostgreSQL + Drizzle connected");
 }
 
-export default dbPlugin;
+export default fp(dbPlugin);

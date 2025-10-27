@@ -5,11 +5,14 @@
   "scripts": {
     "start": "bun src/index.ts --watch",
     "dev": "tsx watch src/index.ts",
+    "db:generate": "bunx drizzle-kit generate --name",
+    "db:migrate": "bunx drizzle-kit push",
     "run-docker": "docker-compose up -d --build"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/pg": "^8.11.8",
+    "drizzle-kit": "^0.31.5",
     "tsx": "^4.20.6"
   },
   "peerDependencies": {
@@ -17,6 +20,7 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.44.7",
     "fastify": "^4.28.1",
     "pg": "^8.12.0"
   }
