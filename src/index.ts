@@ -1,8 +1,6 @@
 import buildApp from "./app";
-import { bootstrapDatabase } from "./database";
 
 try {
-  await bootstrapDatabase();
   const app = buildApp();
   await app.listen({
     port: 3000,
