@@ -10,12 +10,12 @@ async function dbPlugin(fastify: FastifyInstance, options: any) {
     await pool.connect();
     fastify.log.info("🟢 PostgreSQL connected successfully");
 
-    fastify.decorate("db", pool);
-
     fastify.addHook("onClose", async (fastifyInstance) => {
       await pool.end();
       fastifyInstance.log.info("🔴 PostgreSQL connection closed");
     });
+
+    fastify.decorate("db", pool);
   } catch (err) {
     fastify.log.error("❌ PostgreSQL connection error:", err);
     throw err;
