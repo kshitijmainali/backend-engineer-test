@@ -5,8 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1761581809739,
-      "tag": "0000_generate_blocks_table",
+      "when": 1761667454391,
+      "tag": "0000_blocks_txns_output_balance_tables",
       "breakpoints": true
     }
   ]
