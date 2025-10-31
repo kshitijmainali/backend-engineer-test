@@ -27,6 +27,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@sinclair/typebox": "^0.34.41",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.7",
     "fastify": "^4.28.1",
