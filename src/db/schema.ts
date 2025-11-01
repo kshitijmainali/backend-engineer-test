@@ -1,3 +1,4 @@
+import type { InferSelectModel } from 'drizzle-orm';
 import {
   boolean,
   integer,
@@ -53,3 +54,6 @@ export const balances = pgTable('balances', {
     .defaultNow()
     .notNull(),
 });
+
+export type OutputTableRow = InferSelectModel<typeof outputs>;
+export type BalanceTableRow = InferSelectModel<typeof balances>;
