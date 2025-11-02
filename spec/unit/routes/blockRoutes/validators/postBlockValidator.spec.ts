@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, mock, test } from 'bun:test';
 import crypto from 'crypto';
-import type { PostBlockBody } from '../../../../../src/routes/blockRoutes/schema/postBlock';
-import { validateBlock } from '../../../../../src/routes/blockRoutes/validators/postBlockValidator';
+import type { PostBlockBody } from '@/routes/blockRoutes/schema/postBlock';
+import { validateBlock } from '@/routes/blockRoutes/validators/postBlockValidator';
 // Mock the database operations
 const mockDb = {
   select: mock(() => ({
