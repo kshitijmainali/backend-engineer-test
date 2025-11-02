@@ -36,6 +36,10 @@ const validateBlock = async (
   if (!latestBlock.recentHeight && height !== 1) {
     throw new Error('Invalid block height');
   }
+
+  if (height > 1 && !transactions.length) {
+    throw new Error('Transactions are required for non-coinbase blocks');
+  }
 };
 
 export { validateBlock };

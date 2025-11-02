@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, mock, test } from 'bun:test';
-import crypto from 'crypto';
 import type { PostBlockBody } from '@/routes/blockRoutes/schema/postBlock';
 import { validateBlock } from '@/routes/blockRoutes/validators/postBlockValidator';
+import { beforeEach, describe, expect, mock, test } from 'bun:test';
+import crypto from 'crypto';
 // Mock the database operations
 const mockDb = {
   select: mock(() => ({
@@ -147,6 +147,24 @@ describe('validateBlock', () => {
       });
 
       await expect(validateBlock(mockRequest)).resolves.toBeUndefined();
+    });
+
+    test('should reject non-genesis block with no transactions', async () => {
+      mockRequest.body = {
+        height: 2,
+        id: crypto.createHash('sha256').update('2').digest('hex'),
+        transactions: [],
+      };
+
+      mockDb.select.mockReturnValue({
+        from: mock(() => ({
+          limit: mock(() => Promise.resolve([{ recentHeight: 1 }])),
+        })),
+      });
+
+      await expect(validateBlock(mockRequest)).rejects.toThrow(
+        'Transactions are required for non-coinbase blocks'
+      );
     });
 
     test('should reject non-consecutive block height', async () => {
