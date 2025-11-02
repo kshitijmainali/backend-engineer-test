@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { and, eq, inArray, max, sum } from 'drizzle-orm';
+import { and, eq, inArray, max, sql, sum } from 'drizzle-orm';
 import { type FastifyInstance, type FastifyRequest } from 'fastify';
 import {
   blocks,
@@ -85,6 +85,7 @@ const blockRoute = async (fastify: FastifyInstance) => {
         };
         const transactionTableRows: Omit<TransactionTableRow, 'createdAt'>[] =
           [];
+        const spentExistingOutputs: { txId: string; index: number }[] = [];
 
         for (const transaction of transactionsBody) {
           // if there is no input, then this is a coinbase transaction and txn is valid
@@ -156,6 +157,13 @@ const blockRoute = async (fastify: FastifyInstance) => {
             );
           }
 
+          for (const output of existingOutputs) {
+            spentExistingOutputs.push({
+              txId: output.txId,
+              index: output.index,
+            });
+          }
+
           for (const [index, output] of transaction.outputs.entries()) {
             outputTableRows.push({
               txId: transaction.id,
@@ -177,17 +185,18 @@ const blockRoute = async (fastify: FastifyInstance) => {
           });
         }
 
-        request.server.db.transaction(async (tx) => {
-          try {
-            await tx.insert(blocks).values(blockTableRow).execute();
-            await tx
-              .insert(transactions)
-              .values(transactionTableRows)
-              .execute();
-            await tx.insert(outputs).values(outputTableRows).execute();
-          } catch (error) {
-            throw error;
+        await request.server.db.transaction(async (tx) => {
+          await tx.insert(blocks).values(blockTableRow).execute();
+          await tx.insert(transactions).values(transactionTableRows).execute();
+          if (spentExistingOutputs.length) {
+            await tx.execute(
+              sql`UPDATE outputs SET spent = true WHERE (tx_id, "index") IN (${sql.join(
+                spentExistingOutputs.map((o) => sql`(${o.txId}, ${o.index})`),
+                sql`,`
+              )});`
+            );
           }
+          await tx.insert(outputs).values(outputTableRows).execute();
         });
 
         return reply
@@ -204,15 +213,14 @@ const blockRoute = async (fastify: FastifyInstance) => {
     '/balance/:address',
     async (request, reply) => {
       const { address } = request.params;
-
       const [totalBalance] = await request.server.db
         .select({
           balance: sum(outputs.amount),
         })
         .from(outputs)
-        .where(eq(outputs.address, address));
-
-      if (!totalBalance) {
+        .where(and(eq(outputs.address, address), eq(outputs.spent, false)));
+      console.log('totalBalance', totalBalance);
+      if (totalBalance.balance == null) {
         return reply.status(404).send({ message: 'Address not found' });
       }
 
