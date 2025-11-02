@@ -5,7 +5,6 @@ import {
   blocks,
   outputs,
   transactions,
-  type BlockTableRow,
   type OutputTableRow,
   type TransactionTableRow,
 } from '../../db/schema';
@@ -78,10 +77,8 @@ const blockRoute = async (fastify: FastifyInstance) => {
 
         const outputTableRows: Omit<OutputTableRow, 'id' | 'createdAt'>[] = [];
         const balanceTableRows: Map<string, number> = new Map();
-        const blockTableRow: BlockTableRow = {
-          id: request.body.id,
+        const blockTableRow = {
           height: request.body.height,
-          createdAt: new Date().toISOString(),
         };
         const transactionTableRows: Omit<TransactionTableRow, 'createdAt'>[] =
           [];
@@ -219,12 +216,8 @@ const blockRoute = async (fastify: FastifyInstance) => {
         })
         .from(outputs)
         .where(and(eq(outputs.address, address), eq(outputs.spent, false)));
-      console.log('totalBalance', totalBalance);
-      if (totalBalance.balance == null) {
-        return reply.status(404).send({ message: 'Address not found' });
-      }
 
-      return reply.send({ balance: totalBalance.balance });
+      return reply.send({ balance: totalBalance.balance ?? 0 });
     }
   );
 };

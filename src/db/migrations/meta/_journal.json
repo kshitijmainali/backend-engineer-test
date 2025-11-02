@@ -8,6 +8,13 @@
       "when": 1761667454391,
       "tag": "0000_blocks_txns_output_balance_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762082575602,
+      "tag": "0001_block_table_primary_key",
+      "breakpoints": true
     }
   ]
 }

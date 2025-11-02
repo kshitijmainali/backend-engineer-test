@@ -1,4 +1,4 @@
-import type { InferSelectModel } from 'drizzle-orm';
+import { type InferSelectModel } from 'drizzle-orm';
 import {
   boolean,
   integer,
@@ -8,12 +8,13 @@ import {
   serial,
   text,
   timestamp,
+  uuid,
 } from 'drizzle-orm/pg-core';
 
 export const transactionType = pgEnum('transaction_type', ['input', 'output']);
 
 export const blocks = pgTable('blocks', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   height: integer('height').notNull().unique(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
