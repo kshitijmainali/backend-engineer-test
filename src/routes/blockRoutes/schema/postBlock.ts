@@ -25,5 +25,5 @@ const PostBlockSchema = {
 };
 
 type PostBlockBody = Static<typeof PostBlockSchema.body>;
-
-export { PostBlockSchema, type PostBlockBody };
+type TransactionRequestBody = Static<typeof TransactionSchema>;
+export { PostBlockSchema, type PostBlockBody, type TransactionRequestBody };

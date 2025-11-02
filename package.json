@@ -9,7 +9,10 @@
     "db:migrate": "bunx drizzle-kit push",
     "run-docker": "docker-compose up -d --build",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage"
   },
   "devDependencies": {
     "@types/bun": "latest",
