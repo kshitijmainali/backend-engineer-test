@@ -11,7 +11,7 @@ import type { PostBlockBody } from '../schema/postBlock';
 import { validateOutputBalance } from '../validators/outputBalanceValidator';
 import { validateTransactionId } from '../validators/transactionIdValidator';
 
-const getAdressBalance = async (
+const getAddressBalanceController = async (
   request: FastifyRequest<{ Params: { address: string } }>,
   reply: FastifyReply
 ) => {
@@ -34,7 +34,7 @@ const getAdressBalance = async (
   }
 };
 
-const postBlock = async (
+const postBlockController = async (
   request: FastifyRequest<{ Body: PostBlockBody }>,
   reply: FastifyReply
 ) => {
@@ -118,4 +118,4 @@ const postBlock = async (
   }
 };
 
-export { getAdressBalance, postBlock };
+export { getAddressBalanceController, postBlockController };

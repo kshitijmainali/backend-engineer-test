@@ -1,4 +1,4 @@
-import { getAdressBalance } from '@/routes/blockRoutes/controllers';
+import { getAddressBalanceController } from '@/routes/blockRoutes/controllers';
 import { beforeEach, describe, expect, mock, test } from 'bun:test';
 import type { FastifyRequest } from 'fastify';
 
@@ -8,7 +8,7 @@ const mockReply = {
   status: mock((code: number) => code),
 } as any;
 
-describe('getAdressBalance', () => {
+describe('getAddressBalanceController', () => {
   let mockRequest: FastifyRequest<{ Params: { address: string } }>;
   let mockDb = null as any;
   let mockWhere = null as any;
@@ -39,7 +39,7 @@ describe('getAdressBalance', () => {
 
       mockWhere.mockImplementation(() => Promise.resolve([mockBalance]));
 
-      await getAdressBalance(mockRequest, mockReply);
+      await getAddressBalanceController(mockRequest, mockReply);
 
       expect(mockReply.send).toHaveBeenCalledWith({ balance: '150.75' });
     });
@@ -51,7 +51,7 @@ describe('getAdressBalance', () => {
 
       mockWhere.mockImplementation(() => Promise.resolve([{ balance: 0 }]));
 
-      await getAdressBalance(mockRequest, mockReply);
+      await getAddressBalanceController(mockRequest, mockReply);
 
       expect(mockReply.send).toHaveBeenCalledWith({ balance: 0 });
     });
@@ -64,7 +64,7 @@ describe('getAdressBalance', () => {
 
       mockWhere.mockImplementation(() => Promise.resolve([mockBalance]));
 
-      await getAdressBalance(mockRequest, mockReply);
+      await getAddressBalanceController(mockRequest, mockReply);
 
       expect(mockReply.send).toHaveBeenCalledWith({ balance: 0 });
     });
@@ -77,7 +77,7 @@ describe('getAdressBalance', () => {
 
       mockWhere.mockImplementation(() => Promise.resolve([mockBalance]));
 
-      await getAdressBalance(mockRequest, mockReply);
+      await getAddressBalanceController(mockRequest, mockReply);
 
       expect(mockReply.send).toHaveBeenCalledWith({ balance: '1000.00' });
     });
@@ -90,7 +90,7 @@ describe('getAdressBalance', () => {
 
       mockWhere.mockImplementation(() => Promise.resolve([mockBalance]));
 
-      await getAdressBalance(mockRequest, mockReply);
+      await getAddressBalanceController(mockRequest, mockReply);
 
       expect(mockReply.send).toHaveBeenCalledWith({ balance: '123.456789' });
     });
@@ -104,9 +104,9 @@ describe('getAdressBalance', () => {
       mockRequest.params.address = address;
       mockWhere.mockImplementation(() => Promise.resolve([mockBalance]));
 
-      await expect(getAdressBalance(mockRequest, mockReply)).rejects.toThrow(
-        'Address is required'
-      );
+      await expect(
+        getAddressBalanceController(mockRequest, mockReply)
+      ).rejects.toThrow('Address is required');
     });
   });
 });
