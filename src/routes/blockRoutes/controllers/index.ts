@@ -15,15 +15,23 @@ const getAdressBalance = async (
   request: FastifyRequest<{ Params: { address: string } }>,
   reply: FastifyReply
 ) => {
-  const { address } = request.params;
-  const [totalBalance] = await request.server.db
-    .select({
-      balance: sum(outputs.amount),
-    })
-    .from(outputs)
-    .where(and(eq(outputs.address, address), eq(outputs.spent, false)));
+  try {
+    const { address } = request.params;
+    if (!address) {
+      return reply.status(400).send({ message: 'Address is required' });
+    }
+    const [totalBalance] = await request.server.db
+      .select({
+        balance: sum(outputs.amount),
+      })
+      .from(outputs)
+      .where(and(eq(outputs.address, address), eq(outputs.spent, false)));
 
-  return reply.send({ balance: totalBalance.balance ?? 0 });
+    return reply.send({ balance: totalBalance.balance ?? 0 });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 const postBlock = async (

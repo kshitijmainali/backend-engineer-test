@@ -1,25 +1,45 @@
 import { Type, type Static } from '@sinclair/typebox';
 
 const InputSchema = Type.Object({
-  txId: Type.String(),
-  index: Type.Number(),
+  txId: Type.String({
+    minLength: 1,
+    description:
+      'The transaction id of the input. Must be a valid Bitcoin transaction id.',
+    pattern: '^[a-zA-Z0-9]+$',
+  }),
+  index: Type.Number({
+    minimum: 0,
+  }),
 });
 
 const OutputSchema = Type.Object({
-  address: Type.String(),
-  value: Type.Number(),
+  address: Type.String({
+    minLength: 1,
+    format: 'regex',
+    pattern: '^[a-zA-Z0-9]+$',
+    description: 'The address of the output. Must be a valid Bitcoin address.',
+  }),
+  value: Type.Number({
+    minimum: 0,
+  }),
 });
 
 const TransactionSchema = Type.Object({
-  id: Type.String(),
+  id: Type.String({
+    minLength: 1,
+  }),
   inputs: Type.Array(InputSchema),
   outputs: Type.Array(OutputSchema),
 });
 
 const PostBlockSchema = {
   body: Type.Object({
-    height: Type.Integer(),
-    id: Type.String(),
+    height: Type.Integer({
+      minimum: 1,
+    }),
+    id: Type.String({
+      minLength: 1,
+    }),
     transactions: Type.Array(TransactionSchema),
   }),
 };
