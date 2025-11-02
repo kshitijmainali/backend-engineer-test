@@ -3,6 +3,88 @@ import { describe, expect, test } from 'bun:test';
 import { validateWithSchema } from 'spec/helpers';
 
 describe('PostBlock Schema Validation', () => {
+  describe('Schema Structure Validation', () => {
+    test('should have correct structure for body schema', () => {
+      expect(PostBlockSchema.body).toBeDefined();
+      expect(PostBlockSchema.body.type).toBe('object');
+    });
+
+    test('should have height field in body schema', () => {
+      const schema = PostBlockSchema.body as any;
+      expect(schema.properties).toBeDefined();
+      expect(schema.properties.height).toBeDefined();
+      expect(schema.properties.height.type).toBe('integer');
+      expect(schema.properties.height.minimum).toBe(1);
+    });
+
+    test('should have id field in body schema', () => {
+      const schema = PostBlockSchema.body as any;
+      expect(schema.properties).toBeDefined();
+      expect(schema.properties.id).toBeDefined();
+      expect(schema.properties.id.type).toBe('string');
+      expect(schema.properties.id.minLength).toBe(1);
+    });
+
+    test('should have transactions field in body schema', () => {
+      const schema = PostBlockSchema.body as any;
+      expect(schema.properties).toBeDefined();
+      expect(schema.properties.transactions).toBeDefined();
+      expect(schema.properties.transactions.type).toBe('array');
+      expect(schema.properties.transactions.items).toBeDefined();
+      expect(schema.properties.transactions.items.type).toBe('object');
+    });
+
+    test('should have correct structure for transaction schema', () => {
+      const schema = PostBlockSchema.body.properties;
+      expect(schema.transactions).toBeDefined();
+      expect(schema.transactions.items).toBeDefined();
+      expect(schema.transactions.items.type).toBe('object');
+      expect(schema.transactions.items.properties).toBeDefined();
+      expect(schema.transactions.items.properties.id).toBeDefined();
+      expect(schema.transactions.items.properties.id.type).toBe('string');
+      expect(schema.transactions.items.properties.id.minLength).toBe(1);
+      expect(schema.transactions.items.properties.inputs).toBeDefined();
+      expect(schema.transactions.items.properties.inputs.type).toBe('array');
+      expect(schema.transactions.items.properties.inputs.items).toBeDefined();
+      expect(schema.transactions.items.properties.inputs.items.type).toBe(
+        'object'
+      );
+      expect(schema.transactions.items.properties.outputs).toBeDefined();
+      expect(schema.transactions.items.properties.outputs.type).toBe('array');
+      expect(schema.transactions.items.properties.outputs.items).toBeDefined();
+      expect(schema.transactions.items.properties.outputs.items.type).toBe(
+        'object'
+      );
+    });
+
+    test('should have correct structure for input schema', () => {
+      const schema =
+        PostBlockSchema.body.properties.transactions.items.properties.inputs
+          .items;
+      expect(schema.properties).toBeDefined();
+      expect(schema.properties.txId).toBeDefined();
+      expect(schema.properties.txId.type).toBe('string');
+      expect(schema.properties.txId.minLength).toBe(1);
+      expect(schema.properties.index).toBeDefined();
+      expect(schema.properties.index.type).toBe('integer');
+      expect(schema.properties.index.minimum).toBe(0);
+    });
+
+    test('should have correct structure for output schema', () => {
+      const schema =
+        PostBlockSchema.body.properties.transactions.items.properties.outputs
+          .items;
+      expect(schema.properties).toBeDefined();
+      expect(schema.properties.address).toBeDefined();
+      expect(schema.properties.address.type).toBe('string');
+      expect(schema.properties.address.minLength).toBe(1);
+      expect(schema.properties.address.pattern).toBe('^[a-zA-Z0-9]+$');
+      expect(schema.properties.value).toBeDefined();
+      expect(schema.properties.value.type).toBe('number');
+      expect(schema.properties.value.minimum).toBe(0);
+    });
+  });
+
   describe('Height Validation', () => {
     test('should accept valid height values', () => {
       const validHeights = [1, 2, 100, 999999, Number.MAX_SAFE_INTEGER];
