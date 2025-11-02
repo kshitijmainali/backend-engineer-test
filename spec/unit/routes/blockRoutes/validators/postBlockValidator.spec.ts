@@ -189,4 +189,38 @@ describe('validateBlock', () => {
       );
     });
   });
+
+  describe('Edge Cases', () => {
+    test('should handle empty transactions array', async () => {
+      mockRequest.body = {
+        height: 1,
+        id: crypto.createHash('sha256').update('1').digest('hex'),
+        transactions: [],
+      };
+
+      mockDb.select.mockReturnValue({
+        from: mock(() => ({
+          limit: mock(() => Promise.resolve([{ recentHeight: null }])),
+        })),
+      });
+
+      await expect(validateBlock(mockRequest)).resolves.toBeUndefined();
+    });
+
+    test('should handle transactions with no inputs or outputs', async () => {
+      mockRequest.body = {
+        height: 1,
+        id: crypto.createHash('sha256').update('1tx1').digest('hex'),
+        transactions: [{ id: 'tx1', inputs: [], outputs: [] }],
+      };
+
+      mockDb.select.mockReturnValue({
+        from: mock(() => ({
+          limit: mock(() => Promise.resolve([{ recentHeight: null }])),
+        })),
+      });
+
+      await expect(validateBlock(mockRequest)).resolves.toBeUndefined();
+    });
+  });
 });
