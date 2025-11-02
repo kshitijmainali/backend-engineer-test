@@ -1,3 +1,4 @@
+import { BadRequestError, NotFoundError } from '@/utils/appError';
 import { and, eq } from 'drizzle-orm';
 import type { DatabaseClient } from '../../../@types/fastify';
 import { outputs } from '../../../db/schema';
@@ -21,13 +22,13 @@ const validateOutputBalance = async (
         );
 
       if (output && output.spent) {
-        throw new Error(
+        throw new BadRequestError(
           `The transaction with id ${input.txId} and index ${input.index} has already been spent`
         );
       }
 
       if (!output) {
-        throw new Error(
+        throw new NotFoundError(
           `The transaction with id ${input.txId} and index ${input.index} does not exist`
         );
       }
@@ -47,7 +48,9 @@ const validateOutputBalance = async (
   );
 
   if (totalInputAmount !== totalOutputAmount) {
-    throw new Error('Total input amount does not match total output amount');
+    throw new BadRequestError(
+      'Total input amount does not match total output amount'
+    );
   }
 
   return existingOutputs;

@@ -1,3 +1,4 @@
+import { BadRequestError } from '@/utils/appError';
 import { inArray } from 'drizzle-orm';
 import type { DatabaseClient } from '../../../@types/fastify';
 import { outputs } from '../../../db/schema';
@@ -16,7 +17,7 @@ const validateTransactionId = async (
   const uniqueTransactionIds = [...new Set(transactionIds)];
 
   if (uniqueTransactionIds.length !== transactionIds.length) {
-    throw new Error('Duplicate transaction ids found in the block');
+    throw new BadRequestError('Duplicate transaction ids found in the block');
   }
 
   const existingTransactionWithSameIds = await db
@@ -27,7 +28,7 @@ const validateTransactionId = async (
     .where(inArray(outputs.txId, transactionIds));
 
   if (existingTransactionWithSameIds.length > 0) {
-    throw new Error(
+    throw new BadRequestError(
       `Transaction with ids ${transactionIds.join(', ')} already exists`
     );
   }
