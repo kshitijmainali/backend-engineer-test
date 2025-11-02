@@ -7,6 +7,10 @@ const validateTransactionId = async (
   transactionsBody: TransactionRequestBody[],
   db: DatabaseClient
 ) => {
+  if (transactionsBody.length === 0) {
+    return;
+  }
+
   const transactionIds = transactionsBody.map((transaction) => transaction.id);
 
   const uniqueTransactionIds = [...new Set(transactionIds)];
