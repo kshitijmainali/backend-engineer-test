@@ -18,7 +18,7 @@ const getAdressBalance = async (
   try {
     const { address } = request.params;
     if (!address) {
-      return reply.status(400).send({ message: 'Address is required' });
+      throw new Error('Address is required');
     }
     const [totalBalance] = await request.server.db
       .select({
