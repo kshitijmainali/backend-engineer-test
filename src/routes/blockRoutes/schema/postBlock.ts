@@ -7,7 +7,7 @@ const InputSchema = Type.Object({
       'The transaction id of the input. Must be a valid Bitcoin transaction id.',
     pattern: '^[a-zA-Z0-9]+$',
   }),
-  index: Type.Number({
+  index: Type.Integer({
     minimum: 0,
   }),
 });
@@ -15,7 +15,6 @@ const InputSchema = Type.Object({
 const OutputSchema = Type.Object({
   address: Type.String({
     minLength: 1,
-    format: 'regex',
     pattern: '^[a-zA-Z0-9]+$',
     description: 'The address of the output. Must be a valid Bitcoin address.',
   }),
@@ -27,6 +26,7 @@ const OutputSchema = Type.Object({
 const TransactionSchema = Type.Object({
   id: Type.String({
     minLength: 1,
+    pattern: '^[a-zA-Z0-9]+$',
   }),
   inputs: Type.Array(InputSchema),
   outputs: Type.Array(OutputSchema),
