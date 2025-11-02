@@ -9,7 +9,7 @@ import {
 } from '../../../db/schema';
 import type { PostBlockBody } from '../schema/postBlock';
 import { validateOutputBalance } from '../validators/outputBalanceValidator';
-import { validateTransactionId } from '../validators/transacctionIdValidator';
+import { validateTransactionId } from '../validators/transactionIdValidator';
 
 const getAdressBalance = async (
   request: FastifyRequest<{ Params: { address: string } }>,
