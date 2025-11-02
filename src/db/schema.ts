@@ -57,3 +57,5 @@ export const balances = pgTable('balances', {
 
 export type OutputTableRow = InferSelectModel<typeof outputs>;
 export type BalanceTableRow = InferSelectModel<typeof balances>;
+export type BlockTableRow = InferSelectModel<typeof blocks>;
+export type TransactionTableRow = InferSelectModel<typeof transactions>;

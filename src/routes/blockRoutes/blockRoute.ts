@@ -1,11 +1,13 @@
 import crypto from 'crypto';
-import { and, eq, inArray, max } from 'drizzle-orm';
+import { and, eq, inArray, max, sum } from 'drizzle-orm';
 import { type FastifyInstance, type FastifyRequest } from 'fastify';
 import {
-  balances,
   blocks,
   outputs,
+  transactions,
+  type BlockTableRow,
   type OutputTableRow,
+  type TransactionTableRow,
 } from '../../db/schema';
 import { PostBlockSchema, type PostBlockBody } from './schema/postBlock';
 
@@ -49,9 +51,9 @@ const blockRoute = async (fastify: FastifyInstance) => {
     { schema: PostBlockSchema, preHandler: validateBlock },
     async (request, reply) => {
       try {
-        const { transactions } = request.body;
+        const { transactions: transactionsBody } = request.body;
 
-        const transactionIds = transactions.map(
+        const transactionIds = transactionsBody.map(
           (transaction) => transaction.id
         );
 
@@ -76,8 +78,15 @@ const blockRoute = async (fastify: FastifyInstance) => {
 
         const outputTableRows: Omit<OutputTableRow, 'id' | 'createdAt'>[] = [];
         const balanceTableRows: Map<string, number> = new Map();
+        const blockTableRow: BlockTableRow = {
+          id: request.body.id,
+          height: request.body.height,
+          createdAt: new Date().toISOString(),
+        };
+        const transactionTableRows: Omit<TransactionTableRow, 'createdAt'>[] =
+          [];
 
-        for (const transaction of transactions) {
+        for (const transaction of transactionsBody) {
           // if there is no input, then this is a coinbase transaction and txn is valid
           if (!transaction.inputs.length) {
             for (const [index, output] of transaction.outputs.entries()) {
@@ -95,6 +104,10 @@ const blockRoute = async (fastify: FastifyInstance) => {
                 (balanceTableRows.get(output.address) || 0) + output.value
               );
             }
+            transactionTableRows.push({
+              id: transaction.id,
+              blockHeight: request.body.height,
+            });
             continue;
           }
 
@@ -158,22 +171,23 @@ const blockRoute = async (fastify: FastifyInstance) => {
               (balanceTableRows.get(output.address) || 0) + output.value
             );
           }
+          transactionTableRows.push({
+            id: transaction.id,
+            blockHeight: request.body.height,
+          });
         }
 
         request.server.db.transaction(async (tx) => {
-          await tx.insert(outputs).values(outputTableRows).execute();
-          await tx
-            .insert(balances)
-            .values(
-              Array.from(balanceTableRows.entries()).map(
-                ([address, balance]) => ({
-                  address,
-                  balance: balance.toString(),
-                  updatedAt: new Date().toISOString(),
-                })
-              )
-            )
-            .execute();
+          try {
+            await tx.insert(blocks).values(blockTableRow).execute();
+            await tx
+              .insert(transactions)
+              .values(transactionTableRows)
+              .execute();
+            await tx.insert(outputs).values(outputTableRows).execute();
+          } catch (error) {
+            throw error;
+          }
         });
 
         return reply
@@ -183,6 +197,26 @@ const blockRoute = async (fastify: FastifyInstance) => {
         console.error(error);
         throw error;
       }
+    }
+  );
+
+  fastify.get<{ Params: { address: string } }>(
+    '/balance/:address',
+    async (request, reply) => {
+      const { address } = request.params;
+
+      const [totalBalance] = await request.server.db
+        .select({
+          balance: sum(outputs.amount),
+        })
+        .from(outputs)
+        .where(eq(outputs.address, address));
+
+      if (!totalBalance) {
+        return reply.status(404).send({ message: 'Address not found' });
+      }
+
+      return reply.send({ balance: totalBalance.balance });
     }
   );
 };
