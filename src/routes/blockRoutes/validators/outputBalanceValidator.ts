@@ -7,7 +7,10 @@ const validateOutputBalance = async (
   transaction: TransactionRequestBody,
   db: DatabaseClient
 ) => {
-  // if there is an input, then we need to check if the sum of the inputs is equal to the sum of the outputs
+  if (!transaction.inputs.length) {
+    return [];
+  }
+
   const existingOutputs = await Promise.all(
     transaction.inputs.map(async (input) => {
       const [output] = await db
