@@ -14,23 +14,20 @@ const mockOutput = {
 };
 
 let mockDb = null as any;
+let mockWhere = null as any;
+let mockFrom = null as any;
+let mockSelect = null as any;
+
 describe('outputBalanceValidator', () => {
   beforeEach(() => {
-    mockDb = {
-      select: mock(() => ({
-        from: mock(() => ({
-          where: mock(() => Promise.resolve([mockOutput])),
-        })),
-      })),
-    };
+    mockWhere = mock(() => Promise.resolve([] as any[]));
+    mockFrom = mock(() => ({ where: mockWhere }));
+    mockSelect = mock(() => ({ from: mockFrom }));
+    mockDb = { select: mockSelect } as any;
   });
 
   test('should handle genesis transaction', async () => {
-    mockDb.select.mockReturnValue({
-      from: mock(() => ({
-        where: mock(() => Promise.resolve([])),
-      })),
-    });
+    mockWhere.mockImplementation(() => Promise.resolve([]));
 
     const transaction = {
       id: 'tx1',
@@ -50,12 +47,37 @@ describe('outputBalanceValidator', () => {
       outputs: [{ address: 'addr1', value: 10 }],
     } as TransactionRequestBody;
 
+    mockWhere.mockImplementation(() => Promise.resolve([mockOutput]));
+
     await expect(validateOutputBalance(transaction, mockDb)).resolves.toEqual([
       mockOutput,
     ]);
   });
 
+  test('should handle multiple inputs', async () => {
+    mockWhere.mockResolvedValueOnce([mockOutput]);
+    mockWhere.mockResolvedValueOnce([{ ...mockOutput, txId: 'tx2', index: 0 }]);
+
+    const transaction = {
+      id: 'tx3',
+      inputs: [
+        { txId: 'tx1', index: 0 },
+        { txId: 'tx2', index: 0 },
+      ],
+      outputs: [
+        { address: 'addr1', value: 10 },
+        { address: 'addr2', value: 10 },
+      ],
+    } as TransactionRequestBody;
+
+    await expect(validateOutputBalance(transaction, mockDb)).resolves.toEqual([
+      { ...mockOutput, txId: 'tx1', index: 0 },
+      { ...mockOutput, txId: 'tx2', index: 0 },
+    ]);
+  });
+
   test('should throw error when total input amount does not match total output amount', async () => {
+    mockWhere.mockImplementation(() => Promise.resolve([mockOutput]));
     const transaction = {
       id: 'tx3',
       inputs: [{ txId: 'tx1', index: 0 }],
@@ -68,11 +90,9 @@ describe('outputBalanceValidator', () => {
   });
 
   test('should throw error when input is spent', async () => {
-    mockDb.select.mockReturnValue({
-      from: mock(() => ({
-        where: mock(() => Promise.resolve([{ ...mockOutput, spent: true }])),
-      })),
-    });
+    mockWhere.mockImplementation(() =>
+      Promise.resolve([{ ...mockOutput, spent: true }])
+    );
 
     const transaction = {
       id: 'tx4',
@@ -86,11 +106,7 @@ describe('outputBalanceValidator', () => {
   });
 
   test('should throw error when input does not exist', async () => {
-    mockDb.select.mockReturnValue({
-      from: mock(() => ({
-        where: mock(() => Promise.resolve([])),
-      })),
-    });
+    mockWhere.mockImplementation(() => Promise.resolve([]));
 
     const transaction = {
       id: 'tx5',
