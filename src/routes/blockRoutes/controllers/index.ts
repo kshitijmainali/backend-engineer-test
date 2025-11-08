@@ -1,4 +1,5 @@
-import { eq, sum } from 'drizzle-orm';
+import { NotFoundError } from '@/utils/appError';
+import { eq, gt, sum } from 'drizzle-orm';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import {
   balanceDeltas,
@@ -149,4 +150,33 @@ const postBlockController = async (
   }
 };
 
-export { getAddressBalanceController, postBlockController };
+const rollbackController = async (
+  request: FastifyRequest<{ Params: { height: number } }>,
+  reply: FastifyReply
+) => {
+  try {
+    const { height } = request.params;
+
+    const block = await request.server.db
+      .select()
+      .from(blocks)
+      .where(eq(blocks.height, height))
+      .limit(1);
+
+    if (!block) {
+      throw new NotFoundError('Block not found');
+    }
+
+    await request.server.db
+      .delete(blocks)
+      .where(gt(blocks.height, height))
+      .execute();
+
+    return reply.status(200).send({ message: 'Rollback successful' });
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export { getAddressBalanceController, postBlockController, rollbackController };
