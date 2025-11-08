@@ -1,5 +1,8 @@
 import { type FastifyInstance } from 'fastify';
-import { getAdressBalance, postBlock } from './controllers';
+import {
+  getAddressBalanceController,
+  postBlockController,
+} from './controllers';
 import GetAddressBalanceSchema from './schema/getAdressBalance';
 import { PostBlockSchema, type PostBlockBody } from './schema/postBlock';
 import { validateBlock } from './validators/postBlockValidator';
@@ -11,7 +14,7 @@ const blockRoute = async (fastify: FastifyInstance) => {
       schema: PostBlockSchema,
       preHandler: validateBlock,
     },
-    postBlock
+    postBlockController
   );
 
   fastify.get<{ Params: { address: string } }>(
@@ -19,7 +22,7 @@ const blockRoute = async (fastify: FastifyInstance) => {
     {
       schema: GetAddressBalanceSchema,
     },
-    getAdressBalance
+    getAddressBalanceController
   );
 };
 

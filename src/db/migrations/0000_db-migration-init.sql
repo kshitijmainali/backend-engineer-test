@@ -37,6 +37,7 @@ CREATE TABLE "transactions" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "balance_deltas" ADD CONSTRAINT "balance_deltas_block_height_blocks_height_fk" FOREIGN KEY ("block_height") REFERENCES "public"."blocks"("height") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "outputs" ADD CONSTRAINT "outputs_tx_id_transactions_id_fk" FOREIGN KEY ("tx_id") REFERENCES "public"."transactions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "outputs" ADD CONSTRAINT "outputs_block_height_blocks_height_fk" FOREIGN KEY ("block_height") REFERENCES "public"."blocks"("height") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "spent_outputs" ADD CONSTRAINT "spent_outputs_tx_id_transactions_id_fk" FOREIGN KEY ("tx_id") REFERENCES "public"."transactions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

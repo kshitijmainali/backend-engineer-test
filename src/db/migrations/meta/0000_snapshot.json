@@ -1,5 +1,5 @@
 {
-  "id": "9e3c8cb5-32a2-4d78-9190-90fa0c912851",
+  "id": "42cdabac-394c-468c-9190-450e6a902125",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -29,7 +29,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "balance_deltas_block_height_blocks_height_fk": {
+          "name": "balance_deltas_block_height_blocks_height_fk",
+          "tableFrom": "balance_deltas",
+          "tableTo": "blocks",
+          "columnsFrom": [
+            "block_height"
+          ],
+          "columnsTo": [
+            "height"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "balance_deltas_address_block_height_pk": {
           "name": "balance_deltas_address_block_height_pk",

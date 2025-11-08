@@ -66,7 +66,9 @@ export const balanceDeltas = pgTable(
   {
     address: text('address').notNull(),
     balanceDelta: numeric('balance_delta').notNull().default('0'),
-    blockHeight: integer('block_height').notNull(),
+    blockHeight: integer('block_height')
+      .notNull()
+      .references(() => blocks.height, { onDelete: 'cascade' }),
   },
   (table) => [primaryKey({ columns: [table.address, table.blockHeight] })]
 );
