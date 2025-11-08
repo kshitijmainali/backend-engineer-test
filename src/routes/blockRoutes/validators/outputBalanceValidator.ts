@@ -1,7 +1,7 @@
-import { BadRequestError, NotFoundError } from '@/utils/appError';
-import { and, eq } from 'drizzle-orm';
+import { BadRequestError } from '@/utils/appError';
+import { sql } from 'drizzle-orm';
 import type { DatabaseClient } from '../../../@types/fastify';
-import { outputs } from '../../../db/schema';
+import { outputs, spentOutputs } from '../../../db/schema';
 import type { TransactionRequestBody } from '../schema/postBlock';
 
 const validateOutputBalance = async (
@@ -12,30 +12,20 @@ const validateOutputBalance = async (
     return [];
   }
 
-  const existingOutputs = await Promise.all(
-    transaction.inputs.map(async (input) => {
-      const [output] = await db
-        .select()
-        .from(outputs)
-        .where(
-          and(eq(outputs.txId, input.txId), eq(outputs.index, input.index))
-        );
-
-      if (output && output.spent) {
-        throw new BadRequestError(
-          `The transaction with id ${input.txId} and index ${input.index} has already been spent`
-        );
-      }
-
-      if (!output) {
-        throw new NotFoundError(
-          `The transaction with id ${input.txId} and index ${input.index} does not exist`
-        );
-      }
-
-      return output;
-    })
+  const existingOutputKeys = transaction.inputs.map(
+    (input) => sql`(${input.txId}, ${input.index})`
   );
+
+  const existingOutputs = await db
+    .select()
+    .from(outputs)
+    .where(sql`(tx_id, index) IN (${sql.join(existingOutputKeys, sql`,`)})`);
+
+  if (existingOutputs?.length !== existingOutputKeys.length) {
+    throw new BadRequestError(
+      `Some of the input transaction and index pairs do not exist!`
+    );
+  }
 
   const totalInputAmount = existingOutputs.reduce(
     (acc, output) => acc + parseFloat(output.amount),
@@ -50,6 +40,17 @@ const validateOutputBalance = async (
   if (totalInputAmount !== totalOutputAmount) {
     throw new BadRequestError(
       'Total input amount does not match total output amount'
+    );
+  }
+
+  const alreadySpentOutputs = await db
+    .select()
+    .from(spentOutputs)
+    .where(sql`(tx_id, index) IN (${sql.join(existingOutputKeys, ',')})`);
+
+  if (alreadySpentOutputs?.length > 0) {
+    throw new BadRequestError(
+      `The outputs with transaction and index pairs ${alreadySpentOutputs.map((spentOutput) => `(${spentOutput.txId}, ${spentOutput.index})`).join(', ')} have already been spent`
     );
   }
 
