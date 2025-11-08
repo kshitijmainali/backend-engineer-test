@@ -1,7 +1,7 @@
 import { BadRequestError } from '@/utils/appError';
 import { inArray } from 'drizzle-orm';
 import type { DatabaseClient } from '../../../@types/fastify';
-import { outputs } from '../../../db/schema';
+import { transactions } from '../../../db/schema';
 import type { TransactionRequestBody } from '../schema/postBlock';
 
 const validateTransactionId = async (
@@ -22,10 +22,10 @@ const validateTransactionId = async (
 
   const existingTransactionWithSameIds = await db
     .select({
-      txId: outputs.txId,
+      txId: transactions.id,
     })
-    .from(outputs)
-    .where(inArray(outputs.txId, transactionIds));
+    .from(transactions)
+    .where(inArray(transactions.id, transactionIds));
 
   if (existingTransactionWithSameIds.length > 0) {
     throw new BadRequestError(
