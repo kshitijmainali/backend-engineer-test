@@ -1,20 +1,19 @@
 import { type InferSelectModel } from 'drizzle-orm';
 import {
-  boolean,
   integer,
   numeric,
   pgEnum,
   pgTable,
+  primaryKey,
   serial,
   text,
   timestamp,
-  uuid,
 } from 'drizzle-orm/pg-core';
 
 export const transactionType = pgEnum('transaction_type', ['input', 'output']);
 
 export const blocks = pgTable('blocks', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: text('id').primaryKey(),
   height: integer('height').notNull().unique(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
@@ -39,24 +38,38 @@ export const outputs = pgTable('outputs', {
   index: integer('index').notNull(),
   address: text('address').notNull(),
   amount: numeric('amount').notNull(),
-  spent: boolean('spent').notNull().default(false),
-  blockHeight: integer('block_height')
-    .notNull()
-    .references(() => blocks.height, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
     .notNull(),
 });
 
-export const balances = pgTable('balances', {
-  address: text('address').primaryKey(),
-  balance: numeric('balance').notNull().default('0'),
-  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
-    .defaultNow()
-    .notNull(),
-});
+export const spentOutputs = pgTable(
+  'spent_outputs',
+  {
+    txId: text('tx_id')
+      .notNull()
+      .references(() => transactions.id, { onDelete: 'cascade' }),
+    index: integer('index').notNull(),
+    spentAtHeight: integer('spent_at_height').notNull(),
+    spentByTransactionId: text('spent_by_transaction_id')
+      .notNull()
+      .references(() => transactions.id, { onDelete: 'cascade' }),
+  },
+  (table) => [primaryKey({ columns: [table.txId, table.index] })]
+);
+
+export const balanceDeltas = pgTable(
+  'balance_deltas',
+  {
+    address: text('address'),
+    balanceDelta: numeric('balance_delta').notNull().default('0'),
+    blockHeight: integer('block_height'),
+  },
+  (table) => [primaryKey({ columns: [table.address, table.blockHeight] })]
+);
 
 export type OutputTableRow = InferSelectModel<typeof outputs>;
-export type BalanceTableRow = InferSelectModel<typeof balances>;
+export type BalanceDeltaTableRow = InferSelectModel<typeof balanceDeltas>;
 export type BlockTableRow = InferSelectModel<typeof blocks>;
 export type TransactionTableRow = InferSelectModel<typeof transactions>;
+export type SpentOutputTableRow = InferSelectModel<typeof spentOutputs>;
