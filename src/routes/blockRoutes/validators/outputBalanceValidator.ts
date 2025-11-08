@@ -46,7 +46,7 @@ const validateOutputBalance = async (
   const alreadySpentOutputs = await db
     .select()
     .from(spentOutputs)
-    .where(sql`(tx_id, index) IN (${sql.join(existingOutputKeys, ',')})`);
+    .where(sql`(tx_id, index) IN (${sql.join(existingOutputKeys, sql`,`)})`);
 
   if (alreadySpentOutputs?.length > 0) {
     throw new BadRequestError(
