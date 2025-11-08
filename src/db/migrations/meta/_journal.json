@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1761667454391,
-      "tag": "0000_blocks_txns_output_balance_tables",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1762082575602,
-      "tag": "0001_block_table_primary_key",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1762626652920,
-      "tag": "0002_database-with-balance-deltas",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1762626842952,
-      "tag": "0003_table-col-renaming-primary-key",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1762627493795,
-      "tag": "0004_block-table-primary-key",
+      "when": 1762631127095,
+      "tag": "0000_db-migration-init",
       "breakpoints": true
     }
   ]

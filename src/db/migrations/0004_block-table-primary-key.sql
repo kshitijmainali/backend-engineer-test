@@ -1,1 +1,0 @@
-ALTER TABLE "blocks" ALTER COLUMN "id" SET DATA TYPE text;

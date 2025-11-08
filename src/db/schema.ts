@@ -13,7 +13,7 @@ import {
 export const transactionType = pgEnum('transaction_type', ['input', 'output']);
 
 export const blocks = pgTable('blocks', {
-  id: text('id').primaryKey(),
+  id: text('id').notNull().primaryKey(),
   height: integer('height').notNull().unique(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
@@ -21,7 +21,7 @@ export const blocks = pgTable('blocks', {
 });
 
 export const transactions = pgTable('transactions', {
-  id: text('id').primaryKey(),
+  id: text('id').notNull().primaryKey(),
   blockHeight: integer('block_height')
     .notNull()
     .references(() => blocks.height, { onDelete: 'cascade' }),
@@ -31,12 +31,15 @@ export const transactions = pgTable('transactions', {
 });
 
 export const outputs = pgTable('outputs', {
-  id: serial('id').primaryKey(),
+  id: serial('id').notNull().primaryKey(),
   txId: text('tx_id')
     .notNull()
     .references(() => transactions.id, { onDelete: 'cascade' }),
   index: integer('index').notNull(),
   address: text('address').notNull(),
+  blockHeight: integer('block_height')
+    .notNull()
+    .references(() => blocks.height, { onDelete: 'cascade' }),
   amount: numeric('amount').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
@@ -61,9 +64,9 @@ export const spentOutputs = pgTable(
 export const balanceDeltas = pgTable(
   'balance_deltas',
   {
-    address: text('address'),
+    address: text('address').notNull(),
     balanceDelta: numeric('balance_delta').notNull().default('0'),
-    blockHeight: integer('block_height'),
+    blockHeight: integer('block_height').notNull(),
   },
   (table) => [primaryKey({ columns: [table.address, table.blockHeight] })]
 );
