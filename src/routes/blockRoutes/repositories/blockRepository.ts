@@ -30,7 +30,9 @@ export class BlockRepository {
       await tx.insert(blocks).values(blockData.block).execute();
       await tx.insert(transactions).values(blockData.transactions).execute();
       await tx.insert(outputs).values(blockData.outputs).execute();
-      await tx.insert(spentOutputs).values(blockData.spentOutputs).execute();
+      if (blockData.spentOutputs.length > 0) {
+        await tx.insert(spentOutputs).values(blockData.spentOutputs).execute();
+      }
       await tx.insert(balanceDeltas).values(blockData.balanceDeltas).execute();
     });
   }

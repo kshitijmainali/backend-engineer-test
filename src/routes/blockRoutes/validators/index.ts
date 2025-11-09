@@ -23,21 +23,23 @@ class BlockValidator {
     console.log('blockId', blockId);
 
     if (blockId !== id) {
-      throw new Error('Invalid block id');
+      throw new BadRequestError('Invalid block id');
     }
 
     const latestBlock = await this.repository.getLatestBlock();
 
     if (latestBlock.recentHeight && latestBlock.recentHeight !== height - 1) {
-      throw new Error('Invalid block height');
+      throw new BadRequestError('Invalid block height');
     }
 
     if (!latestBlock.recentHeight && height !== 1) {
-      throw new Error('Invalid block height');
+      throw new BadRequestError('Invalid block height');
     }
 
     if (height > 1 && !transactions.length) {
-      throw new Error('Transactions are required for non-coinbase blocks');
+      throw new BadRequestError(
+        'Transactions are required for non-coinbase blocks'
+      );
     }
   }
 
