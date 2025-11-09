@@ -6,7 +6,7 @@ import {
   genesisBlockRow,
   genesisOutputs,
   genesisTransactions,
-} from './integration/testConstants';
+} from './integration/integrationTestConstants';
 
 export const validateWithSchema = (schema: TSchema, data: unknown) => {
   const compiled = TypeCompiler.Compile(schema);

@@ -22,7 +22,7 @@ import {
   genesisOutputs,
   genesisTransactions,
   regularBlockAfterGenesisBlock,
-} from './testConstants';
+} from './integrationTestConstants';
 
 describe('Creat block integration test', () => {
   let app: FastifyInstance;

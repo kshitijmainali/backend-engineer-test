@@ -3,7 +3,7 @@ import type { PostBlockBody } from '@/routes/blockRoutes/schema/postBlock';
 import { BlockService } from '@/routes/blockRoutes/services/blockService';
 import { BadRequestError } from '@/utils/appError';
 import { beforeEach, describe, expect, mock, test } from 'bun:test';
-import { mockGenesisBlock, mockRegularBlock } from 'spec/unit/testConstants';
+import { mockGenesisBlock, mockRegularBlock } from 'spec/unit/unitTestConstants';
 
 describe('BlockService', () => {
   let mockRepository: any;
