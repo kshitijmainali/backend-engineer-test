@@ -35,6 +35,7 @@ describe('Rollback block integration test', () => {
     await app.ready();
     logSpy = spyOn(console, 'error');
 
+    //NOTE: start the server as app.inject is not yet supported in Bun.test
     baseUrl = await app.listen({ port: 8585, host: '127.0.0.1' });
 
     db = (app as any).db;
