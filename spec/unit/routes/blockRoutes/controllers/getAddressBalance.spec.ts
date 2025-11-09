@@ -2,10 +2,17 @@ import { getAddressBalanceController } from '@/routes/blockRoutes/controllers';
 import { beforeEach, describe, expect, mock, test } from 'bun:test';
 import type { FastifyRequest } from 'fastify';
 
+let mockSend = mock((data: any) => data);
+let mockStatus = mock((code: number) => {
+  return {
+    send: mockSend,
+  };
+});
+
 // Mock the reply object
 const mockReply = {
-  send: mock((data: any) => data),
-  status: mock((code: number) => code),
+  send: mockSend,
+  status: mockStatus,
 } as any;
 
 describe('getAddressBalanceController', () => {
@@ -16,8 +23,8 @@ describe('getAddressBalanceController', () => {
   let mockSelect = null as any;
 
   beforeEach(() => {
-    mockReply.send.mockClear();
-    mockReply.status.mockClear();
+    mockSend.mockClear();
+    mockStatus.mockClear();
 
     mockWhere = mock(() => Promise.resolve([] as any[]));
     mockFrom = mock(() => ({ where: mockWhere }));
@@ -104,9 +111,9 @@ describe('getAddressBalanceController', () => {
       mockRequest.params.address = address;
       mockWhere.mockImplementation(() => Promise.resolve([mockBalance]));
 
-      await expect(
-        getAddressBalanceController(mockRequest, mockReply)
-      ).rejects.toThrow('Address is required');
+      await getAddressBalanceController(mockRequest, mockReply);
+
+      expect(mockReply.status).toHaveBeenCalledWith(400);
     });
   });
 });
