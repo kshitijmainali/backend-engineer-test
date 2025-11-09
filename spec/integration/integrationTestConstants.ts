@@ -82,6 +82,61 @@ const regularBlockAfterGenesisBlock = {
   ],
 };
 
+export const regularBlockRow = {
+  id: regularBlockAfterGenesisBlock.id,
+  height: regularBlockAfterGenesisBlock.height,
+  createdAt: expect.any(String),
+};
+
+export const regularBlockTransactions = {
+  id: regularBlockAfterGenesisBlock.transactions[0].id,
+  blockHeight: regularBlockAfterGenesisBlock.height,
+  createdAt: expect.any(String),
+};
+
+export const regularBlockOutputs = [
+  {
+    txId: regularBlockAfterGenesisBlock.transactions[0].id,
+    index: 0,
+    address: '3',
+    amount: '25',
+    blockHeight: 2,
+  },
+  {
+    txId: regularBlockAfterGenesisBlock.transactions[0].id,
+    index: 1,
+    address: '4',
+    amount: '25',
+    blockHeight: 2,
+  },
+];
+export const regularBlockBalanceDeltas = [
+  {
+    address: '1',
+    balanceDelta: '-50',
+    blockHeight: 2,
+  },
+  {
+    address: '3',
+    balanceDelta: '25',
+    blockHeight: 2,
+  },
+  {
+    address: '4',
+    balanceDelta: '25',
+    blockHeight: 2,
+  },
+];
+
+export const regularBlockSpentOutputs = [
+  {
+    txId: genesisBlock.transactions[0].id,
+    index: 0,
+    spentAtHeight: 2,
+    spentByTransactionId: regularBlockAfterGenesisBlock.transactions[0].id,
+  },
+];
+
 export const blockWithIncompleteInputBalanceSpending = {
   height: 2,
   id: '1024d352a6716d0b0931a76b3dfe8e0519c417eb41ccf396bc827ff89c5c2153',

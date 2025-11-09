@@ -4,6 +4,7 @@ import type {
   SpentOutputTableRow,
   TransactionTableRow,
 } from '@/db/schema';
+import { BadRequestError } from '@/utils/appError';
 import { BlockRepository } from '../repositories/blockRepository';
 import type { PostBlockBody } from '../schema/postBlock';
 import BlockValidator from '../validators';
@@ -91,7 +92,7 @@ export class BlockService {
     const block = await this.repository.getBlock(height);
 
     if (!block) {
-      throw new Error('Block not found');
+      throw new BadRequestError('Block not found');
     }
 
     return await this.repository.rollbackBlock(height);

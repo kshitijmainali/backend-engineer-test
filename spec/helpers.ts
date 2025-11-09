@@ -6,6 +6,10 @@ import {
   genesisBlockRow,
   genesisOutputs,
   genesisTransactions,
+  regularBlockAfterGenesisBlock,
+  regularBlockBalanceDeltas,
+  regularBlockOutputs,
+  regularBlockTransactions,
 } from './integration/integrationTestConstants';
 
 export const validateWithSchema = (schema: TSchema, data: unknown) => {
@@ -32,4 +36,19 @@ export const createMockGenesisBlockDatabaseState = async (db: any) => {
   await db
     .insert(schema.balanceDeltas)
     .values([genesisBalanceDeltas[0], genesisBalanceDeltas[1]]);
+};
+
+export const createMockRegularBlockDatabaseState = async (db: any) => {
+  await db.insert(schema.blocks).values({
+    id: regularBlockAfterGenesisBlock.id,
+    height: regularBlockAfterGenesisBlock.height,
+  });
+  await db.insert(schema.transactions).values([
+    {
+      id: regularBlockTransactions.id,
+      blockHeight: regularBlockTransactions.blockHeight,
+    },
+  ]);
+  await db.insert(schema.outputs).values(regularBlockOutputs);
+  await db.insert(schema.balanceDeltas).values(regularBlockBalanceDeltas);
 };
