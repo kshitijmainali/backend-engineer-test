@@ -46,4 +46,12 @@ const PostBlockSchema = {
 
 type PostBlockBody = Static<typeof PostBlockSchema.body>;
 type TransactionRequestBody = Static<typeof TransactionSchema>;
-export { PostBlockSchema, type PostBlockBody, type TransactionRequestBody };
+type InputRequestBody = Static<typeof InputSchema>;
+type OutputRequestBody = Static<typeof OutputSchema>;
+export {
+  PostBlockSchema,
+  type InputRequestBody,
+  type OutputRequestBody,
+  type PostBlockBody,
+  type TransactionRequestBody,
+};
