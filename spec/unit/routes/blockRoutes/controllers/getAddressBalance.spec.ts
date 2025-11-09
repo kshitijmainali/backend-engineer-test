@@ -73,7 +73,9 @@ describe('getAddressBalanceController', () => {
 
       await getAddressBalanceController(mockRequest, mockReply);
 
-      expect(mockReply.send).toHaveBeenCalledWith({ balance: 0 });
+      expect(mockReply.send).toHaveBeenCalledWith({
+        message: 'Address not found',
+      });
     });
 
     test('should handle address with multiple unspent outputs', async () => {
