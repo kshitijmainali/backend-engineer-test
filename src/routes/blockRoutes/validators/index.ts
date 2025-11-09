@@ -61,7 +61,11 @@ class BlockValidator {
     const existingTransactionWithSameIds =
       await this.repository.getTransactionWithSameIds(transactionIds);
 
-    return existingTransactionWithSameIds;
+    if (existingTransactionWithSameIds.length > 0) {
+      throw new BadRequestError(
+        `Transaction with ids ${existingTransactionWithSameIds.map((transaction) => transaction.txId).join(', ')} already exists`
+      );
+    }
   }
 
   async validateIfTransactionAreSpent(transactionInputs: InputRequestBody[]) {
@@ -73,10 +77,9 @@ class BlockValidator {
       await this.repository.getSpentOutputsByTransactionAndIndex(
         transactionInputs
       );
-
     if (alreadySpentOutputs?.length > 0) {
       throw new BadRequestError(
-        `The outputs with transaction and index pairs ${alreadySpentOutputs.map((spentOutput) => `(${spentOutput.txId}, ${spentOutput.index})`).join(', ')} have already been spent`
+        `The inputs with transaction and index pairs ${alreadySpentOutputs.map((spentOutput) => `(${spentOutput.txId}, ${spentOutput.index})`).join(', ')} have already been spent`
       );
     }
   }
