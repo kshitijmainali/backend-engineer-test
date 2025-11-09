@@ -1,4 +1,5 @@
 import type { DatabaseClient } from '@/@types/fastify';
+import { BadRequestError } from '@/utils/appError';
 import BalanceRepository from '../repositories/balanceRepository';
 
 class BalanceService {
@@ -9,6 +10,9 @@ class BalanceService {
 
   async getAddressBalance(address: string) {
     try {
+      if (!address) {
+        throw new BadRequestError('Address is required');
+      }
       const totalBalance = await this.repository.getAddressBalance(address);
       return totalBalance;
     } catch (error) {
