@@ -2,7 +2,7 @@ import fastify from 'fastify';
 import dbPlugin from './plugins/database';
 import globalErrorHandler from './plugins/errorHandler';
 import defaultRoutes from './routes';
-import blockRoute from './routes/blockRoutes/blockRoute';
+import blockRoute from './routes/blockRoutes';
 
 const buildApp = () => {
   const app = fastify({
